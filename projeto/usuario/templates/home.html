@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro e Edição de Usuário</title>
+    <link rel="stylesheet" href="{% static 'usuario/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1 id="form-title">Cadastrar Novo Usuário</h1>
+        <p><a href="/usuarios/">Ver lista de usuários</a></p>
+        
+        <form id="user-form" action="/api/usuarios/" method="post">
+            <input type="hidden" id="user-id">
+
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="idade">Idade:</label>
+                <input type="number" id="idade" name="idade" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefone">Telefone:</label>
+                <div style="display: flex; gap: 10px;">
+                    <select id="ddd" required>
+                        <option value="">Selecione o DDD</option>
+                        <option value="11">11 - São Paulo</option>
+                        <option value="21">21 - Rio de Janeiro</option>
+                        <option value="31">31 - Belo Horizonte</option>
+                        <option value="41">41 - Curitiba</option>
+                        <option value="51">51 - Porto Alegre</option>
+                        <option value="61">61 - Brasília</option>
+                        <option value="71">71 - Salvador</option>
+                        <option value="81">81 - Recife</option>
+                        <option value="85">85 - Fortaleza</option>
+                        <option value="91">91 - Belém</option>
+                    </select>
+                    <input type="tel" id="numero" placeholder="9XXXXXXXX" minlength="9" maxlength="9" required>
+                </div>
+            </div>
+            
+            <input type="hidden" id="telefone" name="telefone">
+
+            <button type="submit" id="submit-btn">Cadastrar</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('user-form');
+        const dddSelect = document.getElementById('ddd');
+        const numeroInput = document.getElementById('numero');
+        const telefoneInput = document.getElementById('telefone');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const userIdInput = document.getElementById('user-id');
+
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get('id');
+
+        // Função para preencher o formulário em caso de edição
+        async function fetchUserToEdit(id) {
+            const response = await fetch(`/api/usuarios/${id}/`);
+            const user = await response.json();
+            
+            formTitle.innerText = `Editar Usuário: ${user.nome}`;
+            submitBtn.innerText = 'Salvar Alterações';
+            userIdInput.value = user.id;
+
+            document.getElementById('nome').value = user.nome;
+            document.getElementById('idade').value = user.idade;
+            
+            // Separa o DDD do resto do número
+            const userDdd = user.telefone.substring(0, 2);
+            const userNumber = user.telefone.substring(2);
+            
+            dddSelect.value = userDdd;
+            document.getElementById('numero').value = userNumber;
+            form.setAttribute('method', 'put');
+        }
+
+        if (userId) {
+            fetchUserToEdit(userId);
+        }
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const method = userId ? 'PUT' : 'POST';
+            const url = userId ? `/api/usuarios/${userId}/` : '/api/usuarios/';
+            
+            const telefoneCompleto = dddSelect.value + numeroInput.value;
+            telefoneInput.value = telefoneCompleto;
+
+            const data = {
+                nome: document.getElementById('nome').value,
+                idade: parseInt(document.getElementById('idade').value),
+                telefone: telefoneCompleto
+            };
+
+            await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            
+            window.location.href = '/usuarios/';
+        });
+    </script>
+</body>
+</html>

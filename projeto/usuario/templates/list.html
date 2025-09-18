@@ -1,0 +1,70 @@
+]{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Usuários</title>
+    <link rel="stylesheet" href="{% static 'usuario/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Lista de Usuários</h1>
+        <p><a href="/">Criar novo usuário</a></p>
+
+        <ul id="user-list">
+            </ul>
+    </div>
+
+    <script>
+        const userList = document.getElementById('user-list');
+
+        // Função para carregar os usuários da API e renderizar a lista
+        async function fetchUsers() {
+            userList.innerHTML = '<li>Carregando...</li>';
+            const response = await fetch('/api/usuarios/');
+            const users = await response.json();
+
+            userList.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${user.nome} (${user.idade} anos) - ${user.telefone}</span>
+                    <button class="edit-btn" data-user-id="${user.id}">Editar</button>
+                    <button class="delete-btn" data-user-id="${user.id}">Deletar</button>
+                `;
+                userList.appendChild(li);
+            });
+
+            // Adiciona o evento de clique para os botões de editar e deletar
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const userId = event.target.dataset.userId;
+                    const confirmDelete = confirm('Tem certeza que deseja deletar este usuário?');
+                    if (confirmDelete) {
+                        await deleteUser(userId);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const userId = event.target.dataset.userId;
+                    window.location.href = `/?id=${userId}`;
+                });
+            });
+        }
+
+        // Função para deletar um usuário
+        async function deleteUser(id) {
+            await fetch(`/api/usuarios/${id}/`, {
+                method: 'DELETE',
+            });
+            fetchUsers();
+        }
+
+        // Carrega a lista de usuários quando a página é carregada
+        document.addEventListener('DOMContentLoaded', fetchUsers);
+    </script>
+</body>
+</html>
