@@ -7,11 +7,11 @@
     <title>Atualizar Livro {{ livro.titulo }}</title>
 </head>
 <body>
-    <h1>Atualizar / Editar livro</h1>
+    <h1>Atualizar / Editar livro - {{ livro.titulo }}</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Atualizar / Editar {{ livro.titulo }}</button>
+        <button type="submit">Atualizar / Editar</button>
     </form>
     <a href="{% url 'listar_livros' %}">Voltar</a>
 </body>
