@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Informações de um Livro</title>
+</head>
+<body>
+    <h1>Buscar informações de um livro</h1>
+<form method="post">
+    {% csrf_token %}
+    <label for="livro_id">Escolha um livro:</label>
+    <select name="livro_id" id="livro_id" required>
+        <option value="">Selecione um livro</option>
+        {% for livro in livros %}
+            <option value="{{ livro.id }}">{{ livro.titulo }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Buscar</button>
+</form>
+
+{% if info_livro %}
+    <h2>Informações do livro:</h2>
+    <ul>
+        <li><strong>Título:</strong> {{ info_livro.titulo }}</li>
+        <li><strong>Autor:</strong> {{ info_livro.autor }}</li>
+        <li><strong>Ano de publicação:</strong> {{ info_livro.ano }}</li>
+        <li><strong>Idiomas:</strong> {{ info_livro.idiomas }}</li>
+    </ul>
+{% endif %}
+<a href="{% url 'listar_livros' %}">Voltar</a>
+</body>
+</html>
