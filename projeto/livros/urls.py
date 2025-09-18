@@ -8,8 +8,7 @@ from .views import(
 
 urlpattern = [
     path("livros/", LivroViewList.as_view(), name="listar_livro"),
-    path("livros/", LivroCreateView.as_view(), name="adicionar_livro"),
-    path("livros/", LivroUpdateView.as_view(), name="atualizar_livro"),
-    path("livros/", LivroDeleteView.as_view(), name="deletar_livro"),
-
+    path("livros/adicionar", LivroCreateView.as_view(), name="adicionar_livro"),
+    path("livros/atualizar", LivroUpdateView.as_view(), name="atualizar_livro"),
+    path("livros/deletar", LivroDeleteView.as_view(), name="deletar_livro"),
 ]
